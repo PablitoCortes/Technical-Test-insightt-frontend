@@ -1,73 +1,83 @@
-# React + TypeScript + Vite
+# Tasker - Frontend 🚀
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A minimalist, modern workspace for managing your daily flow. Built with React, TypeScript, and Vite, featuring a premium UI and secure authentication.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Secure Authentication**: Integration with Auth0 for a safe and seamless login experience.
+- **Task Management**: Full CRUD operations for tasks (Create, Read, Update, Delete).
+- **Workflow Flow**: Move tasks through a defined lifecycle: `PENDING` → `IN_PROGRESS` → `DONE` → `ARCHIVED`.
+- **Intelligent Validations**: Business rules enforced both in UI and API (e.g., only title edits allowed for completed tasks).
+- **Responsive Design**: Premium look and feel using Material UI, optimized for all screen sizes.
+- **Real-time Feedback**: Instant notifications via snackbars for all user actions.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Framework**: [React 19](https://reactjs.org/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **UI Library**: [Material UI (MUI)](https://mui.com/)
+- **Authentication**: [@auth0/auth0-react](https://auth0.com/)
+- **API Client**: [Axios](https://axios-http.com/)
+- **Testing**: [Cypress](https://www.cypress.io/)
 
-## Expanding the ESLint configuration
+## 🚀 Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- npm or yarn
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. Clone the repository
+2. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Environment Variables
+
+Create a `.env` file in the root of the frontend directory with the following configuration:
+
+```env
+VITE_AUTH0_DOMAIN=your-auth0-domain
+VITE_AUTH0_CLIENT_ID=your-auth0-client-id
+VITE_AUTH0_AUDIENCE=https://task-api
+VITE_API_URL=http://localhost:3000/api
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Running the Application
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Start the development server:
+```bash
+npm run dev
 ```
+The application will be available at `http://localhost:5173`.
+
+## 🧪 Testing
+
+The project uses Cypress for End-to-End testing.
+
+### Run Tests (Headless)
+```bash
+npm run cypress:run
+```
+
+### Open Cypress Dashboard
+```bash
+npm run cypress:open
+```
+
+## 🏗️ Architecture
+
+- **`/src/components`**: Reusable UI components (TaskCard, TaskMenu, etc.).
+- **`/src/hooks`**: Custom React hooks for business logic (useTasks).
+- **`/src/services`**: API service layer using Axios.
+- **`/src/auth`**: Authentication providers and protected routes.
+- **`/src/pages`**: Main application views (LoginPage, DashboardPage).
+
