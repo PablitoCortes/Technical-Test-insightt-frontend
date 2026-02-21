@@ -12,7 +12,7 @@ export const useTasks = () => {
 
   const fetchTasks = async () => {
     try {
-      const token = await getAccessTokenSilently()
+      const token = (window as any).Cypress ? 'fake-token' : await getAccessTokenSilently()
       const data = await getTasksService(token)
       setTasks(data)
     } catch (error) {
@@ -27,17 +27,12 @@ export const useTasks = () => {
     fetchTasks()
   }, [])
 
-  useEffect(() => {
-    console.log(tasks)
-  }, [tasks])
-
   const createTask = async (task: Task) => {
     try {
-      const token = await getAccessTokenSilently()
+      const token = (window as any).Cypress ? 'fake-token' : await getAccessTokenSilently()
       const newTask = await createTaskService(task, token)
       setTasks([...tasks, newTask])
     } catch (error) {
-      console.error("Error creating task:", error)
       enqueueSnackbar("Error creating task", { variant: "error" })
       throw error
     }
@@ -46,12 +41,11 @@ export const useTasks = () => {
   const updateTask = async (task: Task) => {
 
     try {
-      const token = await getAccessTokenSilently()
+      const token = (window as any).Cypress ? 'fake-token' : await getAccessTokenSilently()
       const editedTask = await editTaskService(task, token)
       setTasks(prev => prev.map(t => t._id === editedTask._id ? editedTask : t))
       return editedTask
     } catch (error) {
-      console.error("Error updating task:", error)
       enqueueSnackbar("Error updating task", { variant: "error" })
       throw error
     }
@@ -59,12 +53,11 @@ export const useTasks = () => {
 
   const markTaskAsDone = async (task: Task) => {
     try {
-      const token = await getAccessTokenSilently()
+      const token = (window as any).Cypress ? 'fake-token' : await getAccessTokenSilently()
       const updatedTask = await markAsDoneService(task._id!, token)
       setTasks(prev => prev.map(t => t._id === updatedTask._id ? updatedTask : t))
       return updatedTask
     } catch (error) {
-      console.error("Error marking task as done:", error)
       enqueueSnackbar("Error marking task as done", { variant: "error" })
       throw error
     }
@@ -72,12 +65,11 @@ export const useTasks = () => {
 
   const moveTask = async (task: Task) => {
     try {
-      const token = await getAccessTokenSilently()
+      const token = (window as any).Cypress ? 'fake-token' : await getAccessTokenSilently()
       const updatedTask = await moveTaskService(task._id!, task.status, token)
       setTasks(prev => prev.map(t => t._id === updatedTask._id ? updatedTask : t))
       return updatedTask
     } catch (error) {
-      console.error("Error moving task:", error)
       enqueueSnackbar("Error moving task", { variant: "error" })
       throw error
     }
@@ -85,11 +77,10 @@ export const useTasks = () => {
 
   const deleteTask = async (task: Task) => {
     try {
-      const token = await getAccessTokenSilently()
+      const token = (window as any).Cypress ? 'fake-token' : await getAccessTokenSilently()
       await deleteTaskService(task, token)
       setTasks(prev => prev.filter(t => t._id !== task._id))
     } catch (error) {
-      console.error("Error deleting task:", error)
       enqueueSnackbar("Error deleting task", { variant: "error" })
       throw error
     }

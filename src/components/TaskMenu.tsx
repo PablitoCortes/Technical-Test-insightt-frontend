@@ -177,7 +177,7 @@ const TaskMenu: React.FC<TaskMenuProps> = ({ task, onUpdate, onDelete, onMove, o
       </Dialog>
 
       <Dialog open={moveOpen} onClose={() => setMoveOpen(false)}>
-        <DialogTitle>Confirmar Movimiento</DialogTitle>
+        <DialogTitle>Confirm move</DialogTitle>
         <DialogContent>
           <Typography>
             ¿Are you sure you want to move this task to <strong>{nextStatus?.replace('_', ' ')}</strong>?

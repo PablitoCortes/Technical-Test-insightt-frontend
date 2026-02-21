@@ -6,6 +6,12 @@ interface Props {
 }
 
 const AuthProvider = ({ children }: Props) => {
+
+  // 🔥 BYPASS COMPLETO PARA CYPRESS
+  if (typeof window !== "undefined" && (window as any).Cypress) {
+    return <>{children}</>;
+  }
+
   return (
     <Auth0Provider
       domain={import.meta.env.VITE_AUTH0_DOMAIN}

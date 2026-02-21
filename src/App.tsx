@@ -4,7 +4,7 @@ import { SnackbarProvider } from 'notistack'
 import './App.css'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
-import ProtectedRoute from './auth/ProtectedRoute'
+import { ProtectedRoute } from './auth/ProtectedRoute'
 import theme from './theme'
 
 function App() {
