@@ -34,7 +34,9 @@ const NewTaskModal = ({ open, onClose, onSave }: Props) => {
     try {
       await onSave(formData)
       setFormData({ title: "", description: "" })
-      onClose()
+      setTimeout(() => {
+        onClose()
+      }, 1000);
     } catch (error) {
       console.error("Error saving task:", error)
     } finally {

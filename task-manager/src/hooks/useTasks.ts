@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useAuth0 } from "@auth0/auth0-react"
-import { createTaskService, getTasksService } from "../services/tasks.service"
+import { createTaskService, deleteTaskService, editTaskService, getTasksService, markAsDoneService, moveTaskService } from "../services/tasks.service"
 import { Task } from "../interfaces/Task"
 
 export const useTasks = () => {
@@ -24,6 +24,10 @@ export const useTasks = () => {
     fetchTasks()
   }, [])
 
+  useEffect(() => {
+    console.log(tasks)
+  }, [tasks])
+
   const createTask = async (task: Task) => {
     try {
       const token = await getAccessTokenSilently()
@@ -34,10 +38,63 @@ export const useTasks = () => {
       throw error
     }
   }
+
+  const updateTask = async (task: Task) => {
+
+    try {
+      const token = await getAccessTokenSilently()
+      const editedTask = await editTaskService(task, token)
+      setTasks(prev => prev.map(t => t._id === editedTask._id ? editedTask : t))
+      return editedTask
+    } catch (error) {
+      console.error("Error updating task:", error)
+      throw error
+    }
+  }
+
+  const markTaskAsDone = async (task: Task) => {
+    try {
+      const token = await getAccessTokenSilently()
+      const updatedTask = await markAsDoneService(task._id!, token)
+      setTasks(prev => prev.map(t => t._id === updatedTask._id ? updatedTask : t))
+      return updatedTask
+    } catch (error) {
+      console.error("Error marking task as done:", error)
+      throw error
+    }
+  }
+
+  const moveTask = async (task: Task) => {
+    try {
+      const token = await getAccessTokenSilently()
+      const updatedTask = await moveTaskService(task._id!, task.status, token)
+      setTasks(prev => prev.map(t => t._id === updatedTask._id ? updatedTask : t))
+      return updatedTask
+    } catch (error) {
+      console.error("Error moving task:", error)
+      throw error
+    }
+  }
+
+  const deleteTask = async (task: Task) => {
+    try {
+      const token = await getAccessTokenSilently()
+      await deleteTaskService(task, token)
+      setTasks(prev => prev.filter(t => t._id !== task._id))
+    } catch (error) {
+      console.error("Error deleting task:", error)
+      throw error
+    }
+  }
+
   return {
     tasks,
     loading,
     refetch: fetchTasks,
-    createTask
+    createTask,
+    updateTask,
+    markTaskAsDone,
+    moveTask,
+    deleteTask
   }
 }

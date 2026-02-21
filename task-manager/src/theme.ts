@@ -4,10 +4,10 @@ const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#1a1a1a", // Deep slate
+      main: "#1a1a1a",
     },
     background: {
-      default: "#f8fafc", // Very light grey/blue
+      default: "#f8fafc",
       paper: "#ffffff",
     },
     text: {

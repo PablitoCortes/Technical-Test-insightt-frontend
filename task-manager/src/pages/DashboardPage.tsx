@@ -17,52 +17,81 @@ import {
 import {
   Add as AddIcon,
   Logout as LogoutIcon,
-  MoreVert as MoreVertIcon,
   CheckCircle as CheckCircleIcon,
-  RadioButtonUnchecked as PendingIcon
+  RadioButtonUnchecked as PendingIcon,
+  Archive as ArchiveIcon,
+  PlayCircleOutline as ProgressIcon
 } from "@mui/icons-material"
-import { useEffect, useMemo, useState } from "react"
-import { getTasksService, createTaskService } from "../services/tasks.service"
+import { useMemo, useState } from "react"
 import { TaskStatus, type Task } from "../interfaces/Task"
 import NewTaskModal from "../components/newTaskModal"
 import type { CreateTaskDTO } from "../interfaces/Task"
 import { useTasks } from "../hooks/useTasks"
+import TaskMenu from "../components/TaskMenu"
 
-const MockTask = ({ title, status }: { title: string, status: string }) => (
-  <Card sx={{ border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
-    <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={1}>
-        <Stack direction="row" spacing={1} alignItems="center">
-          {status === TaskStatus.COMPLETED ? <CheckCircleIcon color="success" fontSize="small" /> : <PendingIcon color="action" fontSize="small" />}
-          <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '0.75rem', fontWeight: 600 }}>
-            {status}
-          </Typography>
+interface TaskCardProps {
+  task: Task
+  onUpdate: (task: Task) => Promise<void>
+  onDelete: (task: Task) => Promise<void>
+  onMove: (task: Task) => Promise<void>
+  onMarkAsDone?: (task: Task) => Promise<void>
+}
+
+const TaskCard = ({ task, onUpdate, onDelete, onMove, onMarkAsDone }: TaskCardProps) => {
+  const getStatusIcon = () => {
+    switch (task.status) {
+      case TaskStatus.DONE: return <CheckCircleIcon color="success" fontSize="small" />
+      case TaskStatus.IN_PROGRESS: return <ProgressIcon color="primary" fontSize="small" />
+      case TaskStatus.ARCHIVED: return <ArchiveIcon color="action" fontSize="small" />
+      default: return <PendingIcon color="action" fontSize="small" />
+    }
+  }
+
+  const getStatusColor = () => {
+    switch (task.status) {
+      case TaskStatus.DONE: return 'success'
+      case TaskStatus.IN_PROGRESS: return 'primary'
+      case TaskStatus.ARCHIVED: return 'default'
+      default: return 'warning'
+    }
+  }
+
+  return (
+    <Card sx={{ border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+      <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={1}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            {getStatusIcon()}
+            <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '0.75rem', fontWeight: 600 }}>
+              {task.status.replace('_', ' ')}
+            </Typography>
+          </Stack>
+          <TaskMenu task={task} onUpdate={onUpdate} onDelete={onDelete} onMove={onMove} onMarkAsDone={onMarkAsDone} />
         </Stack>
-        <IconButton size="small"><MoreVertIcon fontSize="inherit" /></IconButton>
-      </Stack>
-      <Typography variant="body1" sx={{ fontWeight: 500, mb: 2 }}>{title}</Typography>
-      <Chip
-        label={status}
-        size="small"
-        variant="outlined"
-        sx={{
-          fontSize: '0.65rem',
-          height: 20,
-          fontWeight: 700,
-          borderColor: status === 'DONE' ? 'success.main' : 'warning.main',
-          color: status === 'DONE' ? 'success.main' : 'warning.main'
-        }}
-      />
-    </CardContent>
-  </Card>
-)
+        <Typography variant="body1" sx={{ fontWeight: 500, mb: 1 }}>{task.title}</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          {task.description}
+        </Typography>
+        <Chip
+          label={task.status.replace('_', ' ')}
+          size="small"
+          variant="outlined"
+          color={getStatusColor()}
+          sx={{
+            fontSize: '0.65rem',
+            height: 20,
+            fontWeight: 700,
+          }}
+        />
+      </CardContent>
+    </Card>
+  )
+}
 
 const DashboardPage = () => {
   const { user, logout } = useAuth0()
-  const { tasks, loading, createTask } = useTasks()
+  const { tasks, loading, createTask, updateTask, markTaskAsDone, moveTask, deleteTask } = useTasks()
   const [isModalOpen, setIsModalOpen] = useState(false)
-
-
 
   const handleSaveTask = async (taskDto: CreateTaskDTO) => {
     try {
@@ -77,6 +106,7 @@ const DashboardPage = () => {
       throw error
     }
   }
+
   const pendingTasks = useMemo(
     () => Array.isArray(tasks) ? tasks.filter((task) => task.status === TaskStatus.PENDING) : [],
     [tasks]
@@ -86,7 +116,11 @@ const DashboardPage = () => {
     [tasks]
   );
   const completedTasks = useMemo(
-    () => Array.isArray(tasks) ? tasks.filter((task) => task.status === TaskStatus.COMPLETED) : [],
+    () => Array.isArray(tasks) ? tasks.filter((task) => task.status === TaskStatus.DONE) : [],
+    [tasks]
+  );
+  const archivedTasks = useMemo(
+    () => Array.isArray(tasks) ? tasks.filter((task) => task.status === TaskStatus.ARCHIVED) : [],
     [tasks]
   );
 
@@ -112,7 +146,7 @@ const DashboardPage = () => {
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="lg" sx={{ py: 6, flexGrow: 1 }}>
+      <Container maxWidth="xl" sx={{ py: 6, flexGrow: 1 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="flex-end" mb={6}>
           <Box>
             <Typography variant="h4">Workspace</Typography>
@@ -123,32 +157,45 @@ const DashboardPage = () => {
             onClick={() => setIsModalOpen(true)}
             startIcon={<AddIcon />}>New Task</Button>
         </Stack>
-        <Grid container spacing={3}>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Stack spacing={2}>
-              <Typography variant="overline" color="text.secondary" fontWeight={700}>Pending ({pendingTasks.length})</Typography>
-              {pendingTasks.map((task) => (
-                <MockTask key={task._id} title={task.title} status={task.status} />
-              ))}
-            </Stack>
+
+        {loading ? (
+          <Typography>Loading tasks...</Typography>
+        ) : (
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Stack spacing={2}>
+                <Typography variant="overline" color="text.secondary" fontWeight={700}>Pending ({pendingTasks.length})</Typography>
+                {pendingTasks.map((task) => (
+                  <TaskCard key={task._id} task={task} onMove={moveTask} onUpdate={updateTask} onDelete={deleteTask} onMarkAsDone={markTaskAsDone} />
+                ))}
+              </Stack>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Stack spacing={2}>
+                <Typography variant="overline" color="text.secondary" fontWeight={700}>In Progress ({inProgressTasks.length})</Typography>
+                {inProgressTasks.map((task) => (
+                  <TaskCard key={task._id} task={task} onMove={moveTask} onUpdate={updateTask} onDelete={deleteTask} onMarkAsDone={markTaskAsDone} />
+                ))}
+              </Stack>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Stack spacing={2}>
+                <Typography variant="overline" color="text.secondary" fontWeight={700}>Completed ({completedTasks.length})</Typography>
+                {completedTasks.map((task) => (
+                  <TaskCard key={task._id} task={task} onMove={moveTask} onUpdate={updateTask} onDelete={deleteTask} onMarkAsDone={markTaskAsDone} />
+                ))}
+              </Stack>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Stack spacing={2}>
+                <Typography variant="overline" color="text.secondary" fontWeight={700}>Archived ({archivedTasks.length})</Typography>
+                {archivedTasks.map((task) => (
+                  <TaskCard key={task._id} task={task} onMove={moveTask} onUpdate={updateTask} onDelete={deleteTask} onMarkAsDone={markTaskAsDone} />
+                ))}
+              </Stack>
+            </Grid>
           </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Stack spacing={2}>
-              <Typography variant="overline" color="text.secondary" fontWeight={700}>In Progress ({inProgressTasks.length})</Typography>
-              {inProgressTasks.map((task) => (
-                <MockTask key={task._id} title={task.title} status={task.status} />
-              ))}
-            </Stack>
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Stack spacing={2}>
-              <Typography variant="overline" color="text.secondary" fontWeight={700}>Completed ({completedTasks.length})</Typography>
-              {completedTasks.map((task) => (
-                <MockTask key={task._id} title={task.title} status={task.status} />
-              ))}
-            </Stack>
-          </Grid>
-        </Grid>
+        )}
       </Container>
       <NewTaskModal
         open={isModalOpen}
