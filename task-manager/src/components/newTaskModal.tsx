@@ -32,6 +32,7 @@ const NewTaskModal = ({ open, onClose, onSave }: Props) => {
     e.preventDefault()
     setLoading(true)
     try {
+      if (!formData.title.trim()) return
       await onSave(formData)
       setFormData({ title: "", description: "" })
       setTimeout(() => {

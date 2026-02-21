@@ -187,33 +187,33 @@ const DashboardPage = () => {
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Stack spacing={2}>
                 <Typography variant="overline" color="text.secondary" fontWeight={700}>Pending ({pendingTasks.length})</Typography>
-                {pendingTasks.map((task) => (
+                {pendingTasks.length > 0 ? pendingTasks.map((task) => (
                   <TaskCard key={task._id} task={task} onMove={moveTask} onUpdate={updateTask} onDelete={deleteTask} onMarkAsDone={markTaskAsDone} />
-                ))}
+                )) : <Typography variant="body2" color="text.secondary">No tasks found</Typography>}
               </Stack>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Stack spacing={2}>
                 <Typography variant="overline" color="text.secondary" fontWeight={700}>In Progress ({inProgressTasks.length})</Typography>
-                {inProgressTasks.map((task) => (
+                {inProgressTasks.length > 0 ? inProgressTasks.map((task) => (
                   <TaskCard key={task._id} task={task} onMove={moveTask} onUpdate={updateTask} onDelete={deleteTask} onMarkAsDone={markTaskAsDone} />
-                ))}
+                )) : <Typography variant="body2" color="text.secondary">No tasks found</Typography>}
               </Stack>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Stack spacing={2}>
                 <Typography variant="overline" color="text.secondary" fontWeight={700}>Completed ({completedTasks.length})</Typography>
-                {completedTasks.map((task) => (
+                {completedTasks.length > 0 ? completedTasks.map((task) => (
                   <TaskCard key={task._id} task={task} onMove={moveTask} onUpdate={updateTask} onDelete={deleteTask} onMarkAsDone={markTaskAsDone} />
-                ))}
+                )) : <Typography variant="body2" color="text.secondary">No tasks found</Typography>}
               </Stack>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Stack spacing={2}>
                 <Typography variant="overline" color="text.secondary" fontWeight={700}>Archived ({archivedTasks.length})</Typography>
-                {archivedTasks.map((task) => (
+                {archivedTasks.length > 0 ? archivedTasks.map((task) => (
                   <TaskCard key={task._id} task={task} onMove={moveTask} onUpdate={updateTask} onDelete={deleteTask} onMarkAsDone={markTaskAsDone} />
-                ))}
+                )) : <Typography variant="body2" color="text.secondary">No tasks found</Typography>}
               </Stack>
             </Grid>
           </Grid>
