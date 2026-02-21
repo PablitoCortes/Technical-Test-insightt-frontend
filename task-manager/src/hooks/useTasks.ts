@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react"
 import { useAuth0 } from "@auth0/auth0-react"
+import { useSnackbar } from "notistack"
 import { createTaskService, deleteTaskService, editTaskService, getTasksService, markAsDoneService, moveTaskService } from "../services/tasks.service"
 import { Task } from "../interfaces/Task"
 
 export const useTasks = () => {
   const { getAccessTokenSilently } = useAuth0()
+  const { enqueueSnackbar } = useSnackbar()
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -15,6 +17,7 @@ export const useTasks = () => {
       setTasks(data)
     } catch (error) {
       console.error(error)
+      enqueueSnackbar("Error fetching tasks", { variant: "error" })
     } finally {
       setLoading(false)
     }
@@ -35,6 +38,7 @@ export const useTasks = () => {
       setTasks([...tasks, newTask])
     } catch (error) {
       console.error("Error creating task:", error)
+      enqueueSnackbar("Error creating task", { variant: "error" })
       throw error
     }
   }
@@ -48,6 +52,7 @@ export const useTasks = () => {
       return editedTask
     } catch (error) {
       console.error("Error updating task:", error)
+      enqueueSnackbar("Error updating task", { variant: "error" })
       throw error
     }
   }
@@ -60,6 +65,7 @@ export const useTasks = () => {
       return updatedTask
     } catch (error) {
       console.error("Error marking task as done:", error)
+      enqueueSnackbar("Error marking task as done", { variant: "error" })
       throw error
     }
   }
@@ -72,6 +78,7 @@ export const useTasks = () => {
       return updatedTask
     } catch (error) {
       console.error("Error moving task:", error)
+      enqueueSnackbar("Error moving task", { variant: "error" })
       throw error
     }
   }
@@ -83,6 +90,7 @@ export const useTasks = () => {
       setTasks(prev => prev.filter(t => t._id !== task._id))
     } catch (error) {
       console.error("Error deleting task:", error)
+      enqueueSnackbar("Error deleting task", { variant: "error" })
       throw error
     }
   }

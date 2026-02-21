@@ -13,6 +13,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material"
+import { useSnackbar } from "notistack"
 import {
   MoreVert as MoreVertIcon,
   Edit as EditIcon,
@@ -38,6 +39,7 @@ const NEXT_STATUS: Record<TaskStatus, TaskStatus | null> = {
 
 const TaskMenu: React.FC<TaskMenuProps> = ({ task, onUpdate, onDelete, onMove, onMarkAsDone }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const { enqueueSnackbar } = useSnackbar()
   const open = Boolean(anchorEl)
 
   const [editOpen, setEditOpen] = useState(false)
@@ -57,29 +59,54 @@ const TaskMenu: React.FC<TaskMenuProps> = ({ task, onUpdate, onDelete, onMove, o
   const nextStatus = NEXT_STATUS[task.status]
 
   const handleMove = async () => {
-    if (nextStatus) {
-      await onMove({ ...task, status: nextStatus })
+    try {
+      if (nextStatus) {
+        await onMove({ ...task, status: nextStatus })
+        enqueueSnackbar(`Task moved to ${nextStatus.replace('_', ' ')}`, { variant: "success" })
+      }
+      setMoveOpen(false)
+      handleMenuClose()
+    } catch (error) {
+      // Error handled by hook
+      setMoveOpen(false)
+      handleMenuClose()
     }
-    setMoveOpen(false)
-    handleMenuClose()
   }
 
   const handleDelete = async () => {
-    await onDelete(task)
-    setDeleteOpen(false)
-    handleMenuClose()
+    try {
+      await onDelete(task)
+      enqueueSnackbar("Task deleted successfully", { variant: "success" })
+      setDeleteOpen(false)
+      handleMenuClose()
+    } catch (error) {
+      setDeleteOpen(false)
+      handleMenuClose()
+    }
   }
 
   const handleDone = async () => {
-    await onMarkAsDone?.(task)
-    setMoveOpen(false)
-    handleMenuClose()
+    try {
+      await onMarkAsDone?.(task)
+      enqueueSnackbar("Task marked as done", { variant: "success" })
+      setMoveOpen(false)
+      handleMenuClose()
+    } catch (error) {
+      setMoveOpen(false)
+      handleMenuClose()
+    }
   }
 
   const handleEditSave = async () => {
-    await onUpdate({ ...task, ...editData })
-    setEditOpen(false)
-    handleMenuClose()
+    try {
+      await onUpdate({ ...task, ...editData })
+      enqueueSnackbar("Task updated successfully", { variant: "success" })
+      setEditOpen(false)
+      handleMenuClose()
+    } catch (error) {
+      setEditOpen(false)
+      handleMenuClose()
+    }
   }
 
   return (

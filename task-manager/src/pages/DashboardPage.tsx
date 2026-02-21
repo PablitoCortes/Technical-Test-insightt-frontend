@@ -12,8 +12,10 @@ import {
   IconButton,
   AppBar,
   Toolbar,
-  Avatar
+  Avatar,
+  Skeleton
 } from "@mui/material"
+import { useSnackbar } from "notistack"
 import {
   Add as AddIcon,
   Logout as LogoutIcon,
@@ -90,6 +92,7 @@ const TaskCard = ({ task, onUpdate, onDelete, onMove, onMarkAsDone }: TaskCardPr
 
 const DashboardPage = () => {
   const { user, logout } = useAuth0()
+  const { enqueueSnackbar } = useSnackbar()
   const { tasks, loading, createTask, updateTask, markTaskAsDone, moveTask, deleteTask } = useTasks()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -101,6 +104,7 @@ const DashboardPage = () => {
         status: TaskStatus.PENDING
       }
       await createTask(task)
+      enqueueSnackbar("Task created successfully", { variant: "success" })
     } catch (error) {
       console.error("Error creating task:", error)
       throw error
@@ -159,7 +163,25 @@ const DashboardPage = () => {
         </Stack>
 
         {loading ? (
-          <Typography>Loading tasks...</Typography>
+          <Grid container spacing={3}>
+            {[1, 2, 3, 4].map((col) => (
+              <Grid key={col} size={{ xs: 12, sm: 6, md: 3 }}>
+                <Stack spacing={2}>
+                  <Skeleton variant="text" width="40%" height={24} sx={{ mb: 1 }} />
+                  {[1, 2].map((item) => (
+                    <Card key={item} sx={{ p: 2, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+                      <Stack spacing={1}>
+                        <Skeleton variant="circular" width={24} height={24} />
+                        <Skeleton variant="text" width="80%" height={32} />
+                        <Skeleton variant="text" width="100%" height={20} />
+                        <Skeleton variant="rounded" width={60} height={20} />
+                      </Stack>
+                    </Card>
+                  ))}
+                </Stack>
+              </Grid>
+            ))}
+          </Grid>
         ) : (
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
