@@ -47,7 +47,7 @@ export const deleteTaskService = async (task: Task, token: string) => {
 }
 
 export const markAsDoneService = async (taskId: string, token: string) => {
-  const response = await api.put(`/tasks/${taskId}/markAsDone`, {}, {
+  const response = await api.put(`/tasks/${taskId}/mark-as-done`, {}, {
     headers: {
       Authorization: `Bearer ${token}`
     }
